@@ -1,61 +1,161 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Índice de Juegos</title>
-<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Adivinar el Número</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .game-container {
+            text-align: center;
+            border: 2px solid #ccc;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        select, input[type="number"], button {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+        }
+        .success {
+            color: #28a745;
+        }
+        .info {
+            font-size: 16px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  <div class="container2"><span style="--l: '¡H';">Juegos Clasicos</span></div>
+    <div class="game-container">
+        <h1>Juego de Adivinar el Número</h1>
+        <p>Selecciona un nivel de dificultad:</p>
+        <select id="difficultySelect">
+            <option value="easy">Fácil (1-50)</option>
+            <option value="medium">Medio (1-100)</option>
+            <option value="hard">Difícil (1-200)</option>
+        </select>
+        <p id="levelInfo" class="info"></p>
+        <p id="attemptsInfo" class="info"></p>
+        <input type="number" id="guessInput" min="1">
+        <button onclick="checkGuess()">Adivinar</button>
+        <div id="message" class="message"></div>
+        <button id="restartButton" class="hidden" onclick="startGame()">Jugar de nuevo</button>
+    </div>
 
-  <div class="games-list">
-    <a href="juego_tanque.html" class="game-link">
-      <div class="game-card">
-        <h2>Juego de Tanque</h2>
-        <img src="imagenes/Tanque_2.jpg" alt="Juego de Tanque">
-      </div>
-    </a>
-    <a href="juego_invaders.html" class="game-link">
-      <div class="game-card">
-        <h2>Juego de Invaders</h2>
-        <img src="imagenes/Invaders.png" alt="Juego de Invaders">
-      </div>
-    </a>
-    <a href="juego_rompecabezas.html" class="game-link">
-      <div class="game-card">
-        <h2>Juego de Rompecabezas</h2>
-        <img src="imagenes/Rompecavesas.png" alt="Juego de Rompecabezas">
-      </div>
-    </a>
-    <a href="juego_minas.html" class="game-link">
-      <div class="game-card">
-        <h2>Juego de Minas</h2>
-        <img src="imagenes/Minas.png" alt="Juego de Minas">
-      </div>
-    </a>
-    <a href="juego_memoria.html" class="game-link">
-      <div class="game-card">
-        <h2>Juego de Memoria</h2>
-        <img src="imagenes/Memoria.png" alt="Juego de Memoria">
-      </div>
-    </a>
-    <a href="juego_tictactoe.html" class="game-link">
-      <div class="game-card">
-        <h2>Juego de Triqui</h2>
-        <img src="imagenes/Triqui.png" alt="Juego de Triqui">
-      </div>
-    </a>
-    <a href="juego_ahorcado.html" class="game-link">
-      <div class="game-card">
-        <h2>Juego del Ahorcado</h2>
-        <img src="imagenes/Ahorcado.png" alt="Juego del Ahorcado">
-      </div>
-    </a>
-  </div>
-</div>
+    <script>
+        let secretNumber, attempts, maxAttempts;
 
-<script src="script.js"></script>
+        function startGame() {
+            const difficulty = document.getElementById('difficultySelect').value;
+            const levelInfo = document.getElementById('levelInfo');
+            const attemptsInfo = document.getElementById('attemptsInfo');
+            const messageDiv = document.getElementById('message');
+            const guessInput = document.getElementById('guessInput');
+            const restartButton = document.getElementById('restartButton');
+            
+            // Configura el rango y el número máximo de intentos según la dificultad
+            switch (difficulty) {
+                case 'easy':
+                    secretNumber = Math.floor(Math.random() * 50) + 1;
+                    maxAttempts = 10;
+                    levelInfo.textContent = 'Nivel: Fácil (1-50)';
+                    break;
+                case 'medium':
+                    secretNumber = Math.floor(Math.random() * 100) + 1;
+                    maxAttempts = 7;
+                    levelInfo.textContent = 'Nivel: Medio (1-100)';
+                    break;
+                case 'hard':
+                    secretNumber = Math.floor(Math.random() * 200) + 1;
+                    maxAttempts = 5;
+                    levelInfo.textContent = 'Nivel: Difícil (1-200)';
+                    break;
+            }
+            attempts = 0;
+
+            // Actualiza la interfaz
+            guessInput.value = '';
+            attemptsInfo.textContent = `Intentos restantes: ${maxAttempts}`;
+            messageDiv.textContent = '';
+            restartButton.classList.add('hidden');
+        }
+
+        function checkGuess() {
+            const guessInput = document.getElementById('guessInput');
+            const messageDiv = document.getElementById('message');
+            const attemptsInfo = document.getElementById('attemptsInfo');
+            const restartButton = document.getElementById('restartButton');
+
+            const guess = parseInt(guessInput.value, 10);
+            if (isNaN(guess) || guess < 1 || guess > 200) {
+                messageDiv.textContent = 'Por favor, ingresa un número válido.';
+                messageDiv.className = 'message error';
+                return;
+            }
+
+            attempts++;
+
+            if (guess < secretNumber) {
+                messageDiv.textContent = 'El número es mayor. Intenta de nuevo.';
+                messageDiv.className = 'message error';
+            } else if (guess > secretNumber) {
+                messageDiv.textContent = 'El número es menor. Intenta de nuevo.';
+                messageDiv.className = 'message error';
+            } else {
+                messageDiv.textContent = '¡Felicidades! Has adivinado el número.';
+                messageDiv.className = 'message success';
+                restartButton.classList.remove('hidden');
+                return;
+            }
+
+            if (attempts >= maxAttempts) {
+                messageDiv.textContent = `Se acabaron los intentos. El número era ${secretNumber}.`;
+                messageDiv.className = 'message error';
+                restartButton.classList.remove('hidden');
+            } else {
+                attemptsInfo.textContent = `Intentos restantes: ${maxAttempts - attempts}`;
+            }
+        }
+
+        // Inicializa el juego al cargar la página
+        window.onload = startGame;
+    </script>
 </body>
 </html>
